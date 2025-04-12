@@ -1,17 +1,50 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../config/firebase';
+
 export default function SignUpScreen() {
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
   const navigation = useNavigation();
 
+    const handleSignUp = async () => {
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        Alert.alert('User registered successfully!');
+      } catch (error: any) {
+        Alert.alert('Registration Error', error.message);
+      }
+    };
+
   return (
+
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
 
-      <TextInput style={styles.input} placeholder="Email" />
-      <TextInput style={styles.input} placeholder="Password" secureTextEntry />
+      <TextInput style={styles.input} placeholder="Full name" />
 
-      <TouchableOpacity style={styles.button}>
+      <TextInput
+        style={styles.input} 
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+      />
+
+      <TextInput 
+        style={styles.input} 
+        placeholder="Password" 
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+
+      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
 

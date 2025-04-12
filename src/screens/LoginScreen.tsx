@@ -1,8 +1,8 @@
 import { useNavigation } from '@react-navigation/native';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Button, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import React, { useState } from 'react';
 
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase';
 
 
@@ -12,14 +12,7 @@ export default function LoginScreen() {
 
   const navigation = useNavigation();
 
-  const handleSignUp = async () => {
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      Alert.alert('User registered successfully!');
-    } catch (error: any) {
-      Alert.alert('Registration Error', error.message);
-    }
-  };
+
 
   const handleLogin = async () => {
     try {
