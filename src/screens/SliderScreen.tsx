@@ -99,6 +99,13 @@ export default function SliderScreen() {
           </View>
         </View>
       </ScrollView>
+      <TouchableOpacity
+        style={styles.nextButton}
+        onPress={() => navigation.navigate('Checkbox' as never)} // replace with your actual screen name
+      >
+        <Text style={styles.nextButtonText}>Next</Text>
+      </TouchableOpacity>
+
     </View>
   );
 }
@@ -136,7 +143,7 @@ const styles = StyleSheet.create({
     height: 40,
   },
   checkboxGroup: {
-    marginTop: 5,
+    marginTop: -5,
   },
   checkboxContainer: {
     flexDirection: 'row',
@@ -148,4 +155,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#555',
   },
+  nextButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: '#4AC4C5',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  nextButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  
 });

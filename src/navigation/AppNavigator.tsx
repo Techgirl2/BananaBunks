@@ -3,11 +3,14 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from '../screens/LoginScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 import SliderScreen from '../screens/SliderScreen';
+import CheckboxScreen from '../screens/CheckboxScreen';
 
 export type RootStackParamList = {
   Login: undefined;
   SignUp: undefined;
   Slider: undefined;
+  Checkbox: undefined;
+
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -19,6 +22,7 @@ export default function AppNavigator() {
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Slider" component={SliderScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Checkbox" component={CheckboxScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
