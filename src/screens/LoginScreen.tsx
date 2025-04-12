@@ -1,18 +1,59 @@
 import { useNavigation } from '@react-navigation/native';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Button, Alert } from 'react-native';
+import React, { useState } from 'react';
+
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../config/firebase';
 
 
 export default function LoginScreen() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
   const navigation = useNavigation();
+
+  const handleSignUp = async () => {
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      Alert.alert('User registered successfully!');
+    } catch (error: any) {
+      Alert.alert('Registration Error', error.message);
+    }
+  };
+
+  const handleLogin = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      Alert.alert('Login successful!');
+    } catch (error: any) {
+      Alert.alert('Login Error', error.message);
+    }
+  };
+
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>BananaBucks</Text>
 
-      <TextInput style={styles.input} placeholder="Email" />
-      <TextInput style={styles.input} placeholder="Password" secureTextEntry />
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+      />
 
-      <TouchableOpacity style={styles.button}>
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+
+      <TouchableOpacity 
+        style={styles.button}
+        onPress={handleLogin}
+        >
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
 
@@ -59,5 +100,3 @@ const styles = StyleSheet.create({
     color: '#007bff',
   },
 });
-
-  
