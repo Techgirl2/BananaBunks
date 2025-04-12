@@ -16,7 +16,7 @@ export default function SignUpScreen() {
     const handleSignUp = async () => {
       try {
         await createUserWithEmailAndPassword(auth, email, password);
-        Alert.alert('User registered successfully!');
+        navigation.navigate('Slider' as never);
       } catch (error: any) {
         Alert.alert('Registration Error', error.message);
       }
