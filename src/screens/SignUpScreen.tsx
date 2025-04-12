@@ -1,23 +1,22 @@
-import { useNavigation } from '@react-navigation/native';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-
-export default function LoginScreen() {
+export default function SignUpScreen() {
   const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>BananaBucks</Text>
+      <Text style={styles.title}>Sign Up</Text>
 
       <TextInput style={styles.input} placeholder="Email" />
       <TextInput style={styles.input} placeholder="Password" secureTextEntry />
 
       <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Login</Text>
+        <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('SignUp' as never)}>
-        <Text style={styles.linkText}>Don't have an account? Sign up</Text>
+      <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Text style={styles.linkText}>Already have an account? Log in</Text>
       </TouchableOpacity>
     </View>
   );
@@ -28,7 +27,7 @@ const styles = StyleSheet.create({
     padding: 20,
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#07C5C5',
+    backgroundColor: '#fff',
   },
   title: {
     fontSize: 32,
@@ -44,7 +43,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   button: {
-    backgroundColor: '#ffcb05', // Banana-colored 😄
+    backgroundColor: '#ffcb05', // Same banana-yellow :)
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
@@ -59,5 +58,3 @@ const styles = StyleSheet.create({
     color: '#007bff',
   },
 });
-
-  
