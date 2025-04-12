@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, ScrollView, Switch } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity, Image } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
+import CustomCheckbox from '../components/CustomCheckbox';
 
 export default function SliderScreen() {
   const navigation = useNavigation();
@@ -22,10 +24,16 @@ export default function SliderScreen() {
   const [prefersQuiet, setPrefersQuiet] = useState(0.5);
   const quietRef = useRef(prefersQuiet);
 
-  // State for switches
-  const [noPets, setNoPets] = useState(false);
-  const [noRoommates, setNoRoommates] = useState(false);
-  const [noOvernightGuests, setNoOvernightGuests] = useState(false);
+
+  const [checks, setChecks] = useState({
+      noPets: false,
+      noRoommates: false,
+      noOvernightGuests: false,
+  });
+
+  const toggle = (key: keyof typeof checks) => {
+    setChecks((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const renderSlider = (
     labelLeft: string,
@@ -66,46 +74,32 @@ export default function SliderScreen() {
         {renderSlider('Introvert', 'Extrovert', sociability, setSociability, socialRef)}
         {renderSlider('Prefers Quiet', 'Prefers Loud', prefersQuiet, setPrefersQuiet, quietRef)}
 
-        {/* Switches for preferences */}
         <View style={styles.checkboxGroup}>
-          <View style={styles.checkboxContainer}>
-            <Text style={styles.checkboxLabel}>No Pets</Text>
-            <Switch
-              value={noPets}
-              onValueChange={setNoPets}
-              thumbColor={noPets ? '#4AC4C5' : '#F6B151'}
-              trackColor={{ false: '#ddd', true: '#F6B151' }}
+            <CustomCheckbox
+            label="no pets"
+            checked={checks.noPets}
+            onPress={() => toggle('noPets')}
             />
-          </View>
-
-          <View style={styles.checkboxContainer}>
-            <Text style={styles.checkboxLabel}>No Roommates</Text>
-            <Switch
-              value={noRoommates}
-              onValueChange={setNoRoommates}
-              thumbColor={noRoommates ? '#4AC4C5' : '#F6B151'}
-              trackColor={{ false: '#ddd', true: '#F6B151' }}
+            <CustomCheckbox
+            label="no roommates"
+            checked={checks.noRoommates}
+            onPress={() => toggle('noRoommates')}
             />
-          </View>
-
-          <View style={styles.checkboxContainer}>
-            <Text style={styles.checkboxLabel}>No Overnight Guests</Text>
-            <Switch
-              value={noOvernightGuests}
-              onValueChange={setNoOvernightGuests}
-              thumbColor={noOvernightGuests ? '#4AC4C5' : '#F6B151'}
-              trackColor={{ false: '#ddd', true: '#F6B151' }}
+            <CustomCheckbox
+            label="no overnight guests"
+            checked={checks.noOvernightGuests}
+            onPress={() => toggle('noOvernightGuests')}
             />
-          </View>
         </View>
-      </ScrollView>
-      <TouchableOpacity
-        style={styles.nextButton}
-        onPress={() => navigation.navigate('Checkbox' as never)} // replace with your actual screen name
-      >
-        <Text style={styles.nextButtonText}>Next</Text>
-      </TouchableOpacity>
 
+      </ScrollView>
+      <View style={styles.arrowContainer}>
+        {/* Right Arrow */}
+        <TouchableOpacity style={styles.rightArrow} onPress={() => navigation.navigate('Checkbox' as never)}>
+            <FontAwesome name="arrow-right" size={30} color="#333" />
+        </TouchableOpacity>
+
+      </View>
     </View>
   );
 }
@@ -122,12 +116,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginTop: 30,
-    marginBottom: 40,
+    marginTop: 35,
+    marginBottom: 30,
     textAlign: 'center',
   },
   sliderGroup: {
-    marginBottom: 10,
+    marginBottom: 20,
   },
   labelsRow: {
     flexDirection: 'row',
@@ -143,36 +137,22 @@ const styles = StyleSheet.create({
     height: 40,
   },
   checkboxGroup: {
-    marginTop: -5,
-  },
-  checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between', // Aligns the label and switch across the row
-    marginBottom: 15,
-  },
-  checkboxLabel: {
-    fontSize: 16,
-    color: '#555',
-  },
-  nextButton: {
+    marginLeft: 10,
+  }, 
+  arrowContainer: {
     position: 'absolute',
-    bottom: 20,
-    right: 20,
-    backgroundColor: '#4AC4C5',
-    paddingVertical: 10,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
     paddingHorizontal: 20,
-    borderRadius: 25,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5,
+    paddingBottom: 20,
+    zIndex: 1, // Ensure arrows are above other content
   },
-  nextButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+  rightArrow: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   
 });

@@ -4,12 +4,14 @@ import LoginScreen from '../screens/LoginScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 import SliderScreen from '../screens/SliderScreen';
 import CheckboxScreen from '../screens/CheckboxScreen';
+import EditProfileScreen from '../screens/EditProfileScreen';
 
 export type RootStackParamList = {
   Login: undefined;
   SignUp: undefined;
   Slider: undefined;
   Checkbox: undefined;
+  EditProfile: undefined;
 
 };
 
@@ -23,6 +25,7 @@ export default function AppNavigator() {
         <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Slider" component={SliderScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Checkbox" component={CheckboxScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
