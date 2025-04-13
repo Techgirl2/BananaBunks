@@ -51,41 +51,34 @@ export default function EditProfileScreen() {
       alert('Permission to access camera roll is required!');
       return;
     }
-  
+
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
     });
-  
     if (!result.canceled) {
       const response = await fetch(result.assets[0].uri);
       const blob = await response.blob();
-  
       const imageRef = ref(storage, `profilePictures/${profile.uid}.jpg`);
       await uploadBytes(imageRef, blob);
-  
       const downloadURL = await getDownloadURL(imageRef);
-  
-      // Step 1: Update local context
       setProfile(prev => ({
         ...prev,
         profilePicture: downloadURL,
       }));
-  
-      // ✅ Step 2: Save URL to Firestore immediately!
-      try {
-        await updateDoc(doc(db, 'users', profile.uid), {
-          profilePicture: downloadURL,
-        });
-        alert('Profile picture updated!');
-      } catch (error) {
-        console.error('Error updating Firestore profile picture:', error);
-        alert('Failed to save profile picture.');
-      }
+      
+      setProfile(prev => ({
+        ...prev,
+        profilePicture: downloadURL,
+      }));
+
+      alert('Profile picture updated!');
     }
-  };
+
+
+
 
   // const handlePickImage = async () => {
   //   const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -93,30 +86,42 @@ export default function EditProfileScreen() {
   //     alert('Permission to access camera roll is required!');
   //     return;
   //   }
-
+  
   //   const result = await ImagePicker.launchImageLibraryAsync({
   //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
   //     allowsEditing: true,
   //     aspect: [1, 1],
   //     quality: 1,
   //   });
-
+  
   //   if (!result.canceled) {
   //     const response = await fetch(result.assets[0].uri);
   //     const blob = await response.blob();
+  
   //     const imageRef = ref(storage, `profilePictures/${profile.uid}.jpg`);
   //     await uploadBytes(imageRef, blob);
+  
   //     const downloadURL = await getDownloadURL(imageRef);
-
+  
+  //     // Step 1: Update local context
   //     setProfile(prev => ({
   //       ...prev,
   //       profilePicture: downloadURL,
   //     }));
-
-  //     alert('Profile picture updated!');
+  
+  //     // ✅ Step 2: Save URL to Firestore immediately!
+  //     try {
+  //       await updateDoc(doc(db, 'users', profile.uid), {
+  //         profilePicture: downloadURL,
+  //       });
+  //       alert('Profile picture updated!');
+  //     } catch (error) {
+  //       console.error('Error updating Firestore profile picture:', error);
+  //       alert('Failed to save profile picture.');
+  //     }
   //   }
   // };
-
+}
   return (
     <View style={styles.main}>
       <Text style={styles.title}>{profile.fullName || 'Your Name'}</Text>
@@ -177,6 +182,7 @@ export default function EditProfileScreen() {
     </View>
   );
 }
+  
 
 const styles = StyleSheet.create({
   main: {
@@ -271,3 +277,158 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+//   return (
+//     <View style={styles.main}>
+//       <Text style={styles.title}>{profile.fullName || 'Your Name'}</Text>
+
+//       <View style={styles.picContainer}>
+//         {profile.profilePicture ? (
+//           <Image
+//             source={{ uri: profile.profilePicture }}
+//             style={styles.profilePic}
+//           />
+//         ) : (
+//           <View style={styles.profilePicPlaceholder} />
+//         )}
+//         <TouchableOpacity style={styles.uploadButton} onPress={handlePickImage}>
+//           <Text style={styles.uploadButtonText}>+ Add / update profile pic</Text>
+//         </TouchableOpacity>
+//       </View>
+
+//       <Text style={styles.emojis}>
+//         {profile.personalityTraits?.map((trait) => {
+//           const emojiMap: Record<string, string> = {
+//             artistic: '🎨',
+//             outdoorsy: '🌲',
+//             bookworm: '📖',
+//             gymRat: '💪',
+//             gamer: '🎮',
+//             musical: '🎵',
+//           };
+//           return emojiMap[trait] || '';
+//         }).join(' ')}
+//       </Text>
+
+//       <View style={styles.tagsContainer}>
+//         {getPreferenceTags().map((tag) => (
+//           <View key={tag} style={styles.tag}>
+//             <Text style={styles.tagText}>{tag}</Text>
+//           </View>
+//         ))}
+//       </View>
+
+//       <TextInput
+//         style={styles.textBox}
+//         value={profile.description}
+//         placeholder="No description provided."
+//         editable={false}
+//         multiline
+//       />
+
+//       <View style={styles.arrowContainer}>
+//         <TouchableOpacity onPress={() => navigation.navigate('Checkbox' as never)}>
+//           <FontAwesome name="arrow-left" size={30} color="#333" />
+//         </TouchableOpacity>
+
+//         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+//           <Text style={styles.submitButtonText}>Submit</Text>
+//         </TouchableOpacity>
+//       </View>
+//     </View>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   main: {
+//     flex: 1,
+//     backgroundColor: '#F4E8A0',
+//     padding: 20,
+//     paddingBottom: 80, // extra space for bottom buttons
+//   },
+//   title: {
+//     fontSize: 24,
+//     fontWeight: 'bold',
+//     textAlign: 'center',
+//     marginTop: 30,
+//     marginBottom: 20,
+//   },
+//   picContainer: {
+//     alignItems: 'center',
+//     marginBottom: 20,
+//   },
+//   profilePic: {
+//     width: 150,
+//     height: 150,
+//     borderRadius: 75,
+//     marginBottom: 10,
+//   },
+//   profilePicPlaceholder: {
+//     width: 150,
+//     height: 150,
+//     borderRadius: 75,
+//     backgroundColor: '#4AC4C5',
+//     marginBottom: 10,
+//   },
+//   uploadButton: {
+//     alignSelf: 'center',
+//     backgroundColor: '#4AC4C5',
+//     paddingVertical: 8,
+//     paddingHorizontal: 15,
+//     borderRadius: 20,
+//   },
+//   uploadButtonText: {
+//     color: 'white',
+//     fontWeight: 'bold',
+//   },
+//   emojis: {
+//     fontSize: 20,
+//     textAlign: 'center',
+//     marginBottom: 15,
+//   },
+//   tagsContainer: {
+//     flexDirection: 'row',
+//     flexWrap: 'wrap',
+//     justifyContent: 'center',
+//     marginBottom: 20,
+//   },
+//   tag: {
+//     backgroundColor: '#F6B151',
+//     borderRadius: 20,
+//     paddingVertical: 5,
+//     paddingHorizontal: 10,
+//     margin: 4,
+//   },
+//   tagText: {
+//     color: '#333',
+//     fontWeight: '500',
+//   },
+//   textBox: {
+//     backgroundColor: '#FDF4E3',
+//     borderRadius: 15,
+//     padding: 10,
+//     fontSize: 16,
+//     height: 225,
+//     textAlignVertical: 'top',
+//     marginBottom: 20,
+//   },
+//   arrowContainer: {
+//     position: 'absolute',
+//     bottom: 20,
+//     left: 20,
+//     right: 20,
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//   },
+//   submitButton: {
+//     backgroundColor: '#4AC4C5',
+//     paddingVertical: 8,
+//     paddingHorizontal: 20,
+//     borderRadius: 8,
+//   },
+//   submitButtonText: {
+//     color: 'white',
+//     fontWeight: 'bold',
+//   },
+// });

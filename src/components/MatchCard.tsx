@@ -1,5 +1,5 @@
-import React, { useState} from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Animated   } from 'react-native';
+import React, { useState, useRef} from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Animated, Easing   } from 'react-native';
 import Fontisto from '@expo/vector-icons/Fontisto';
 
 type MatchCardProps = {
@@ -13,11 +13,27 @@ type MatchCardProps = {
 
 export default function MatchCard({ profilePicture, fullName, description, tags, email = "No email provided" }: MatchCardProps) {
   const [showEmail, setShowEmail] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
 
   const toggleEmail = () => {
-    setShowEmail((prev) => !prev);
-  };
-  return (
+    if (showEmail) {
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.ease),
+      }).start(() => setShowEmail(false));
+    } else {
+      setShowEmail(true);
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.ease),
+      }).start();
+    }
+  };return (
     <View style={styles.cardContainer}>
       {/* Top Row */}
       <View style={styles.topRow}>
@@ -33,7 +49,7 @@ export default function MatchCard({ profilePicture, fullName, description, tags,
         <View style={{ alignItems: 'center' }}>
           {showEmail && <Text style={styles.emailPopup}>{email}</Text>}
           <TouchableOpacity style={styles.iconWrapper} onPress={toggleEmail}>
-            <Fontisto name="email" size={20} color="black" />
+            <Fontisto name="email" size={20} color="white" />
           </TouchableOpacity>
         </View>
       </View>
@@ -60,6 +76,56 @@ export default function MatchCard({ profilePicture, fullName, description, tags,
 
     </View>
   );
+
+
+
+
+//   const toggleEmail = () => {
+//     setShowEmail((prev) => !prev);
+//   };
+//   return (
+//     <View style={styles.cardContainer}>
+//       {/* Top Row */}
+//       <View style={styles.topRow}>
+
+//       {profilePicture ? (
+//           <Image source={{ uri: profilePicture }} style={styles.blueBox} />
+//         ) : (
+//           <View style={styles.blueBox} />
+//         )}
+
+//         <Text style={styles.nameText}>{fullName}</Text>
+
+//         <View style={{ alignItems: 'center' }}>
+//           {showEmail && <Text style={styles.emailPopup}>{email}</Text>}
+//           <TouchableOpacity style={styles.iconWrapper} onPress={toggleEmail}>
+//             <Fontisto name="email" size={20} color="black" />
+//           </TouchableOpacity>
+//         </View>
+//       </View>
+
+//       {/* Tags Row */}
+//       <ScrollView
+//   horizontal
+//   showsHorizontalScrollIndicator={false}
+//   contentContainerStyle={styles.tagsRow}
+// >
+//   {tags.map((tag, index) => (
+//     <View key={index} style={styles.tag}>
+//       <Text style={styles.tagText}>{tag}</Text>
+//     </View>
+//   ))}
+// </ScrollView>
+
+//       {/* Input description here from firebase */}
+//       <View style={styles.descriptionBox}>
+//         <ScrollView style={styles.descriptionScroll} nestedScrollEnabled showsVerticalScrollIndicator={false}>
+//           <Text style={styles.descriptionText}>{description}</Text>
+//         </ScrollView>
+//       </View>
+
+//     </View>
+//   );
 }
 
 const styles = StyleSheet.create({
@@ -88,12 +154,14 @@ const styles = StyleSheet.create({
     },
     emailPopup: {
       backgroundColor: 'white',
-      color: 'black',
       paddingHorizontal: 8,
       paddingVertical: 4,
       borderRadius: 6,
-      marginBottom: 4,
-      fontSize: 12,
+      elevation: 3,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
     },
     nameText: {
       flex: 1,
