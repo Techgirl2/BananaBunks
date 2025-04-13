@@ -18,7 +18,7 @@ export default function LoginScreen() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       //Alert.alert('Login successful!');
-      navigation.navigate('Matches' as never)
+      navigation.navigate('Swipes' as never)
     } catch (error: any) {
       Alert.alert('Login Error', error.message);
     }
