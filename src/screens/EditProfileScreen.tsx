@@ -6,7 +6,7 @@ import { useProfile } from '../context/ProfileContext';
 import * as ImagePicker from 'expo-image-picker';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage, db } from '../config/firebase';
-import { doc, updateDoc, setDoc } from 'firebase/firestore';
+import { doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
 
 export default function EditProfileScreen() {
   const navigation = useNavigation();
@@ -65,8 +65,18 @@ export default function EditProfileScreen() {
   
       const imageRef = ref(storage, `profilePictures/${profile.uid}.jpg`);
       await uploadBytes(imageRef, blob);
+
+      
   
       const downloadURL = await getDownloadURL(imageRef);
+
+      const updatedProfile = {
+        ...profile,
+        profilePicture: downloadURL,
+      };
+      
+      // Step 2: Update local context
+      setProfile(updatedProfile);
   
       // Step 1: Update local context
       setProfile(prev => ({
@@ -76,10 +86,23 @@ export default function EditProfileScreen() {
   
       // ✅ Step 2: Save URL to Firestore immediately!
       try {
-        await updateDoc(doc(db, 'users', profile.uid), {
-          profilePicture: downloadURL,
-        });
+        await setDoc(doc(db, 'users', profile.uid), updatedProfile, { merge: true });
+
+        const docRef = doc(db, 'users', profile.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const freshProfile = docSnap.data();
+          setProfile(freshProfile as any); // 👈 force refresh profile context
+          console.log('✅ Fresh profile fetched after image upload:', freshProfile);
+        }
+
+
         alert('Profile picture updated!');
+        // await setDoc(doc(db, 'users', profile.uid), {
+        //   ...profile,
+        //   profilePicture: downloadURL,
+        // }, { merge: true });
+        // alert('Profile picture updated!');
       } catch (error) {
         console.error('Error updating Firestore profile picture:', error);
         alert('Failed to save profile picture.');

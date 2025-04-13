@@ -1,12 +1,37 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import React, { useEffect} from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useProfile } from '../context/ProfileContext';
 import Navbar from '../components/Navbar';
-
+import * as ImagePicker from 'expo-image-picker';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../config/firebase';
+import { defaultProfile } from '../context/ProfileContext';
 export default function ProfileScreen() {
   const navigation = useNavigation();
-  const { profile } = useProfile();
+  const { profile, setProfile } = useProfile();
+  
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const docRef = doc(db, 'users', profile.uid);
+        const docSnap = await getDoc(docRef);
+  
+        if (docSnap.exists()) {
+          const freshData = docSnap.data();
+          setProfile(freshData as any); // ideally, use ProfileType!
+          //console.log('✅ Profile refreshed in ProfileScreen:', freshData);
+        }
+      } catch (error) {
+        console.error('Error fetching profile in ProfileScreen:', error);
+      }
+    };
+  
+    if (profile.uid) {
+      fetchProfile();
+    }
+  }, [profile]);
 
   const getPreferenceTags = () => {
     const tags: string[] = [];
@@ -36,12 +61,26 @@ export default function ProfileScreen() {
     return tags;
   };
 
+
+
   return (
     <View style={styles.main}>
       <View style={styles.content}>
         <Text style={styles.title}>{profile.fullName || 'Your Name'}</Text>
 
-        <View style={styles.profilePicPlaceholder} />
+        <View style={styles.picContainer}>
+                {profile.profilePicture ? (
+                  <Image
+                    source={{ uri: profile.profilePicture }}
+                    style={styles.profilePic}
+                  />
+                ) : (
+                  <View style={styles.profilePicPlaceholder} />
+                )}
+                {/* <TouchableOpacity style={styles.uploadButton} onPress={handlePickImage}>
+                  <Text style={styles.uploadButtonText}>+ Add / update profile pic</Text>
+                </TouchableOpacity> */}
+              </View>
 
         <TouchableOpacity style={styles.uploadButton} onPress={() => navigation.navigate('EditProfile' as never)}>
           <Text style={styles.uploadButtonText}>Edit Profile</Text>
@@ -77,9 +116,15 @@ export default function ProfileScreen() {
           multiline
         />
         <View style={styles.logoutContainer}>
-            <TouchableOpacity style={styles.logout} onPress={() => navigation.navigate('Login' as never)}>
-                <Text style={styles.logoutText}>Logout</Text>
-            </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.logout}
+          onPress={() => {
+            setProfile(defaultProfile); // ⬅️ Reset context!
+            navigation.navigate('Login' as never);
+          }}
+        >
+  <Text style={styles.logoutText}>Logout</Text>
+</TouchableOpacity>
         </View>
 
       </View>
@@ -97,6 +142,10 @@ const styles = StyleSheet.create({
       flex: 1,
       padding: 10,
     },
+    picContainer: {
+      alignItems: 'center',
+      marginBottom: 20,
+    },
     title: {
       fontSize: 30,
       fontWeight: 'bold',
@@ -104,12 +153,17 @@ const styles = StyleSheet.create({
       marginBottom: 10,
       marginTop: 30,
     },
+    profilePic: {
+      width: 150,
+      height: 150,
+      borderRadius: 75,
+      marginBottom: 10,
+    },
     profilePicPlaceholder: {
       width: 150,
       height: 150,
       borderRadius: 75,
       backgroundColor: '#4AC4C5',
-      alignSelf: 'center',
       marginBottom: 10,
     },
     uploadButton: {

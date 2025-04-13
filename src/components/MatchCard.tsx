@@ -1,5 +1,5 @@
-import React, { useState} from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Animated   } from 'react-native';
+import React, { useState, useRef} from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Animated, Easing   } from 'react-native';
 import Fontisto from '@expo/vector-icons/Fontisto';
 
 type MatchCardProps = {
@@ -13,9 +13,25 @@ type MatchCardProps = {
 
 export default function MatchCard({ profilePicture, fullName, description, tags, email = "No email provided" }: MatchCardProps) {
   const [showEmail, setShowEmail] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const toggleEmail = () => {
-    setShowEmail((prev) => !prev);
+    if (showEmail) {
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.ease),
+      }).start(() => setShowEmail(false));
+    } else {
+      setShowEmail(true);
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.ease),
+      }).start();
+    }
   };
   return (
     <View style={styles.cardContainer}>
@@ -33,7 +49,7 @@ export default function MatchCard({ profilePicture, fullName, description, tags,
         <View style={{ alignItems: 'center' }}>
           {showEmail && <Text style={styles.emailPopup}>{email}</Text>}
           <TouchableOpacity style={styles.iconWrapper} onPress={toggleEmail}>
-            <Fontisto name="email" size={20} color="black" />
+            <Fontisto name="email" size={20} color="white" />
           </TouchableOpacity>
         </View>
       </View>
@@ -88,12 +104,14 @@ const styles = StyleSheet.create({
     },
     emailPopup: {
       backgroundColor: 'white',
-      color: 'black',
       paddingHorizontal: 8,
       paddingVertical: 4,
       borderRadius: 6,
-      marginBottom: 4,
-      fontSize: 12,
+      elevation: 3,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
     },
     nameText: {
       flex: 1,

@@ -9,6 +9,7 @@ import { ProfileType } from '../context/ProfileContext';
 
 export default function MatchesScreen() {
   const { profile } = useProfile();
+
   const [matches, setMatches] = useState<ProfileType[]>([]);
   const [loading, setLoading] = useState(true);
   console.log('Profile matches:', profile.matches);

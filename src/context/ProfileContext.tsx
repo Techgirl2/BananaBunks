@@ -32,7 +32,7 @@ export type ProfileType = {
 };
 
 // Default empty profile
-const defaultProfile: ProfileType = {
+export const defaultProfile: ProfileType = {
   uid: '',
   fullName: '',
   email: '',
