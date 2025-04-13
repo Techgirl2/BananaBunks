@@ -38,3 +38,7 @@ What's beyond the scope of the MVP:
 - user can go back and update information (will require recalibrating all the matched algorithm stuff so for now we'll keep initial preferences fixed however, we will set up the workflow for it)
 
 - add a "price range" field : maybe one line that contains two sliders? So people looking for a place can specify the monetary range they're looking for and people looking to fill their vacancies already have a definite idea for how much it will cost them, so they will put a more narrower interval down. We just need to check to see if their price interval falls inside the price range of someone looking for housing. (vacancy filler user's range is a subset of house searcher's price range)
+
+
+https://icons.expo.fyi/Index/Entypo/circle-with-cross
+https://icons.expo.fyi/Index/FontAwesome/check-circle
