@@ -11,8 +11,8 @@ LoginScreen routes to SignUpScreen and vice versa
 MVP: 
 - let a user make an account and login [DONE] 
 
-- outline edit profile workflow on the frontend 
-- store user data like living prefrerences, hobbies, etc. in JSON in firestore 
+- outline edit profile workflow on the frontend [DONE]
+- store user data like living prefrerences, hobbies, etc. in JSON in firestore [DONE]
 
 - implement UI from figma for edit profile pages, main profile page, swiping page, matched page 
 

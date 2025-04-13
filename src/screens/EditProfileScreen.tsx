@@ -6,7 +6,7 @@ import { useProfile } from '../context/ProfileContext';
 import * as ImagePicker from 'expo-image-picker';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage, db } from '../config/firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, updateDoc, setDoc } from 'firebase/firestore';
 
 export default function EditProfileScreen() {
   const navigation = useNavigation();
@@ -51,29 +51,71 @@ export default function EditProfileScreen() {
       alert('Permission to access camera roll is required!');
       return;
     }
-
+  
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
     });
-
+  
     if (!result.canceled) {
       const response = await fetch(result.assets[0].uri);
       const blob = await response.blob();
+  
       const imageRef = ref(storage, `profilePictures/${profile.uid}.jpg`);
       await uploadBytes(imageRef, blob);
+  
       const downloadURL = await getDownloadURL(imageRef);
-
+  
+      // Step 1: Update local context
       setProfile(prev => ({
         ...prev,
         profilePicture: downloadURL,
       }));
-
-      alert('Profile picture updated!');
+  
+      // ✅ Step 2: Save URL to Firestore immediately!
+      try {
+        await updateDoc(doc(db, 'users', profile.uid), {
+          profilePicture: downloadURL,
+        });
+        alert('Profile picture updated!');
+      } catch (error) {
+        console.error('Error updating Firestore profile picture:', error);
+        alert('Failed to save profile picture.');
+      }
     }
   };
+
+  // const handlePickImage = async () => {
+  //   const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  //   if (!permissionResult.granted) {
+  //     alert('Permission to access camera roll is required!');
+  //     return;
+  //   }
+
+  //   const result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  //     allowsEditing: true,
+  //     aspect: [1, 1],
+  //     quality: 1,
+  //   });
+
+  //   if (!result.canceled) {
+  //     const response = await fetch(result.assets[0].uri);
+  //     const blob = await response.blob();
+  //     const imageRef = ref(storage, `profilePictures/${profile.uid}.jpg`);
+  //     await uploadBytes(imageRef, blob);
+  //     const downloadURL = await getDownloadURL(imageRef);
+
+  //     setProfile(prev => ({
+  //       ...prev,
+  //       profilePicture: downloadURL,
+  //     }));
+
+  //     alert('Profile picture updated!');
+  //   }
+  // };
 
   return (
     <View style={styles.main}>

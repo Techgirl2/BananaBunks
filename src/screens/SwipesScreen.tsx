@@ -9,10 +9,19 @@ import Navbar from '../components/Navbar';
 import { ProfileType } from '../context/ProfileContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
+import { getDoc } from 'firebase/firestore';
+
 export default function SwipeScreen() {
   const { profile, setProfile } = useProfile();
   const [candidates, setCandidates] = useState<ProfileType[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // const refreshProfile = async () => {
+  //   const docSnap = await getDoc(doc(db, 'users', profile.uid));
+  //   if (docSnap.exists()) {
+  //     setProfile(docSnap.data() as ProfileType);
+  //   }
+  // };
 
   useEffect(() => {
     const fetchCandidates = async () => {
@@ -70,7 +79,14 @@ export default function SwipeScreen() {
       }
     }
 
-    setProfile(updatedProfile);
+    const refreshProfile = async () => {
+      const docSnap = await getDoc(doc(db, 'users', profile.uid));
+      if (docSnap.exists()) {
+        setProfile(docSnap.data() as ProfileType);
+      }
+    };
+  
+    await refreshProfile();
   };
 
   return (

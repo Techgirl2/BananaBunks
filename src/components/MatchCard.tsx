@@ -1,51 +1,60 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState} from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Animated   } from 'react-native';
 import Fontisto from '@expo/vector-icons/Fontisto';
 
-export default function MatchCard() {
+type MatchCardProps = {
+  profilePicture?: string;
+  fullName: string;
+  description: string;
+  tags: string[];
+  email?: string;
+};
+
+
+export default function MatchCard({ profilePicture, fullName, description, tags, email = "No email provided" }: MatchCardProps) {
+  const [showEmail, setShowEmail] = useState(false);
+
+  const toggleEmail = () => {
+    setShowEmail((prev) => !prev);
+  };
   return (
     <View style={styles.cardContainer}>
       {/* Top Row */}
       <View style={styles.topRow}>
 
-        {/*Input photo from firebase */}
-        <View style={styles.blueBox} />
+      {profilePicture ? (
+          <Image source={{ uri: profilePicture }} style={styles.blueBox} />
+        ) : (
+          <View style={styles.blueBox} />
+        )}
 
-        {/*Input real name from firebase */}
-        <Text style={styles.nameText}>Alex Johnson</Text>
+        <Text style={styles.nameText}>{fullName}</Text>
 
-        <TouchableOpacity style={styles.iconWrapper}>
-          <Fontisto name="email" size={20} color="black" />
-        </TouchableOpacity>
+        <View style={{ alignItems: 'center' }}>
+          {showEmail && <Text style={styles.emailPopup}>{email}</Text>}
+          <TouchableOpacity style={styles.iconWrapper} onPress={toggleEmail}>
+            <Fontisto name="email" size={20} color="black" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Tags Row */}
       <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.tagsRow}
-      >
-        {/*Input tags from firebase here */}
-        <View style={styles.tag}><Text style={styles.tagText}>#clean_freak</Text></View>
-        <View style={styles.tag}><Text style={styles.tagText}>#night_owl</Text></View>
-        <View style={styles.tag}><Text style={styles.tagText}>#introvert</Text></View>
-        <View style={styles.tag}><Text style={styles.tagText}>#no_dogs</Text></View>
-        <View style={styles.tag}><Text style={styles.tagText}>#is_quiet</Text></View>
-      </ScrollView>
+  horizontal
+  showsHorizontalScrollIndicator={false}
+  contentContainerStyle={styles.tagsRow}
+>
+  {tags.map((tag, index) => (
+    <View key={index} style={styles.tag}>
+      <Text style={styles.tagText}>{tag}</Text>
+    </View>
+  ))}
+</ScrollView>
 
       {/* Input description here from firebase */}
       <View style={styles.descriptionBox}>
-        <ScrollView
-            style={styles.descriptionScroll}
-            nestedScrollEnabled
-            showsVerticalScrollIndicator={false}
-        >
-            <Text style={styles.descriptionText}>
-            I love painting, hiking, and reading. Always down for a calm weekend and good conversation.
-            Sometimes I write long things to see how it scrolls when the box fills up with way too much
-            info that nobody asked for but here it is anyway because maybe someone actually does want to
-            know how long this description can go before it overflows.
-            </Text>
+        <ScrollView style={styles.descriptionScroll} nestedScrollEnabled showsVerticalScrollIndicator={false}>
+          <Text style={styles.descriptionText}>{description}</Text>
         </ScrollView>
       </View>
 
@@ -77,6 +86,15 @@ const styles = StyleSheet.create({
       borderRadius: 4,
       marginRight: 10,
     },
+    emailPopup: {
+      backgroundColor: 'white',
+      color: 'black',
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 6,
+      marginBottom: 4,
+      fontSize: 12,
+    },
     nameText: {
       flex: 1,
       fontSize: 18,
@@ -86,6 +104,7 @@ const styles = StyleSheet.create({
     iconWrapper: {
       padding: 4,
     },
+
     tagsRow: {
       flexDirection: 'row',
       flexWrap: 'wrap',

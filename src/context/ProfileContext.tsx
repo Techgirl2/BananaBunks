@@ -2,7 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
-
+import { DocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { onSnapshot } from 'firebase/firestore';
 // Define profile shape
 export type ProfileType = {
   uid: string;
@@ -72,26 +73,36 @@ export const ProfileProvider = ({ children }: { children: React.ReactNode }) => 
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    let unsubscribeFromFirestore: (() => void) | null = null;
+  
+    const unsubscribeFromAuth = onAuthStateChanged(auth, (user) => {
       if (user) {
         const docRef = doc(db, 'users', user.uid);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          console.log('Fetched profile from Firestore:', docSnap.data());
-          setProfile(docSnap.data() as ProfileType);
-        } else {
-          console.log('No profile found for user:', user.uid);
-        }
+  
+        // ✅ Subscribe to Firestore real-time updates
+        unsubscribeFromFirestore = onSnapshot(docRef, (docSnap: DocumentSnapshot<DocumentData>) => {
+          if (docSnap.exists()) {
+            console.log('📡 Real-time profile update:', docSnap.data());
+            setProfile(docSnap.data() as ProfileType);
+          } else {
+            console.log('No profile found for user:', user.uid);
+          }
+        });
       } else {
         console.log('User signed out or not logged in');
         setProfile(defaultProfile);
       }
-
+  
       setLoading(false);
     });
-
-    return unsubscribe;
+  
+    return () => {
+      // Clean up listeners on unmount
+      unsubscribeFromAuth();
+      if (unsubscribeFromFirestore) {
+        unsubscribeFromFirestore();
+      }
+    };
   }, []);
 
   // Optional loading wrapper (prevents rendering children too early)
