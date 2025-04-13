@@ -5,6 +5,8 @@ import SignUpScreen from '../screens/SignUpScreen';
 import SliderScreen from '../screens/SliderScreen';
 import CheckboxScreen from '../screens/CheckboxScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
+import { ProfileProvider } from '../context/ProfileContext';
+
 
 export type RootStackParamList = {
   Login: undefined;
@@ -19,6 +21,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function AppNavigator() {
   return (
+    <ProfileProvider>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
@@ -28,5 +31,6 @@ export default function AppNavigator() {
         <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
+    </ProfileProvider>
   );
 }

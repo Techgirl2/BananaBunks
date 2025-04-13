@@ -4,22 +4,52 @@ import CustomCheckbox from '../components/CustomCheckbox';
 import { FontAwesome } from '@expo/vector-icons';
 import { TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useProfile } from '../context/ProfileContext';
 
 export default function CheckboxScreen() {
-  const [checks, setChecks] = useState({
-    artistic: false,
-    outdoorsy: false,
-    bookworm: false,
-    gymRat: false,
-    gamer: false,
-    musical: false,
-  });
 
-  const [description, setDescription] = useState("");
+  
 
-  const toggle = (key: keyof typeof checks) => {
-    setChecks((prev) => ({ ...prev, [key]: !prev[key] }));
+  const { profile, setProfile } = useProfile();
+
+  // const [checks, setChecks] = useState({
+  //   artistic: false,
+  //   outdoorsy: false,
+  //   bookworm: false,
+  //   gymRat: false,
+  //   gamer: false,
+  //   musical: false,
+  // });
+
+
+
+  //const [description, setDescription] = useState("");
+  const checks = profile.personalityTraits || [];
+  const description = profile.description; 
+  
+  const updateTraits = (trait: string) => {
+    setProfile(prev => {
+      const traits = prev.personalityTraits || [];
+      return {
+        ...prev,
+        personalityTraits: traits.includes(trait)
+          ? traits.filter(t => t !== trait)
+          : [...traits, trait],
+      };
+    });
   };
+
+  const updateDescription = (text: string) => {
+    setProfile(prev => ({
+      ...prev,
+      description: text,
+    }));
+  };
+
+
+  // const toggle = (key: keyof typeof checks) => {
+  //   setChecks((prev) => ({ ...prev, [key]: !prev[key] }));
+  // };
   
   const navigation = useNavigation();
 
@@ -29,41 +59,47 @@ export default function CheckboxScreen() {
         <Text style={styles.title}>What kind of person are you?</Text>
         <View style={styles.checkboxGroup}>
             <CustomCheckbox
-            label="artistic 🎨"
-            checked={checks.artistic}
-            onPress={() => toggle('artistic')}
+              label="artistic 🎨"
+              checked={checks.includes('artistic')}
+              onPress={() => {
+                console.log('Pressed: artistic');
+                updateTraits('artistic');
+              }}
             />
+            {/* <TouchableOpacity onPress={() => console.log('Test button works')}>
+              <Text>Test Button</Text>
+            </TouchableOpacity> */}
             <CustomCheckbox
             label="outdoorsy 🌲"
-            checked={checks.outdoorsy}
-            onPress={() => toggle('outdoorsy')}
+            checked={checks.includes('outdoorsy')}
+            onPress={() => updateTraits('outdoorsy')}
             />
             <CustomCheckbox
             label="bookworm 📖"
-            checked={checks.bookworm}
-            onPress={() => toggle('bookworm')}
+            checked={checks.includes('bookworm')}
+            onPress={() => updateTraits('bookworm')}
             />
             <CustomCheckbox
             label="gym rat 💪"
-            checked={checks.gymRat}
-            onPress={() => toggle('gymRat')}
+            checked={checks.includes('gymRat')}
+            onPress={() => updateTraits('gymRat')}
             />
             <CustomCheckbox
             label="gamer 🎮"
-            checked={checks.gamer}
-            onPress={() => toggle('gamer')}
+            checked={checks.includes('gamer')}
+            onPress={() => updateTraits('gamer')}
             />
             <CustomCheckbox
             label="musical 🎵"
-            checked={checks.musical}
-            onPress={() => toggle('musical')}
+            checked={checks.includes('musical')}
+            onPress={() => updateTraits('musical')}
             />
         </View>
         <Text style={styles.subtitle}>Add a personal description:</Text>
         <TextInput
           style={styles.textBox}
           value={description}
-          onChangeText={setDescription}
+          onChangeText={updateDescription}
           placeholder="This is your chance to write a fun introduction for yourself! You may also include any important information that you weren't able to include earlier."
           multiline
         />

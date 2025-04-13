@@ -5,29 +5,51 @@ import { useNavigation } from '@react-navigation/native';
 
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase';
+import { useProfile } from '../context/ProfileContext';
 
 export default function SignUpScreen() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
 
   const navigation = useNavigation();
 
-    const handleSignUp = async () => {
-      try {
-        await createUserWithEmailAndPassword(auth, email, password);
-        navigation.navigate('Slider' as never);
-      } catch (error: any) {
-        Alert.alert('Registration Error', error.message);
-      }
-    };
+  const { setProfile } = useProfile();
+
+  const handleSignUp = async () => {
+    if (!fullName.trim()) {
+      Alert.alert('Missing Information', 'Please enter your full name.');
+      return;
+    }
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+  
+      // Update global profile context
+      setProfile(prev => ({
+        ...prev,
+        fullName,
+        email,
+      }));
+  
+      navigation.navigate('Slider' as never);
+    } catch (error: any) {
+      Alert.alert('Registration Error', error.message);
+    }
+  };
 
   return (
 
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
 
-      <TextInput style={styles.input} placeholder="Full name" />
+      <TextInput
+        style={styles.input}
+        placeholder="Full name"
+        value={fullName}
+        onChangeText={setFullName}
+      />
 
       <TextInput
         style={styles.input} 

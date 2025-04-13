@@ -5,43 +5,57 @@ import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity, Image } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import CustomCheckbox from '../components/CustomCheckbox';
+import { useProfile } from '../context/ProfileContext';
 
 export default function SliderScreen() {
   const navigation = useNavigation();
+  const { profile, setProfile } = useProfile();
 
-  const [noiseTolerance, setNoiseTolerance] = useState(0.5);
-  const noiseRef = useRef(noiseTolerance);
-
-  const [sleepSchedule, setSleepSchedule] = useState(0.5);
-  const sleepRef = useRef(sleepSchedule);
-
-  const [cleanliness, setCleanliness] = useState(0.5);
-  const cleanRef = useRef(cleanliness);
-
-  const [sociability, setSociability] = useState(0.5);
-  const socialRef = useRef(sociability);
-
-  const [prefersQuiet, setPrefersQuiet] = useState(0.5);
-  const quietRef = useRef(prefersQuiet);
-
-
-  const [checks, setChecks] = useState({
-      noPets: false,
-      noRoommates: false,
-      noOvernightGuests: false,
-  });
-
-  const toggle = (key: keyof typeof checks) => {
-    setChecks((prev) => ({ ...prev, [key]: !prev[key] }));
+  const updatePreference = (key: keyof typeof profile.preferences, value: number) => {
+    setProfile(prev => ({
+      ...prev,
+      preferences: { ...prev.preferences, [key]: Math.round(value * 100) },
+    }));
   };
 
-  const renderSlider = (
-    labelLeft: string,
-    labelRight: string,
-    value: number,
-    setValue: (v: number) => void,
-    refValue: React.MutableRefObject<number>
-  ) => (
+  const updateRule = (key: keyof typeof profile.rules, value: boolean) => {
+    setProfile(prev => ({
+      ...prev,
+      rules: { ...prev.rules, [key]: value },
+    }));
+  };
+
+  // replace state hooks with profile state
+  const checks = profile.rules;
+//   const [checks, setChecks] = useState({
+//     noPets: false,
+//     noRoommates: false,
+//     noOvernightGuests: false,
+// });
+
+  const toggle = (key: keyof typeof checks) => {
+    updateRule(key, !checks[key]);
+  };
+// const toggle = (key: keyof typeof checks) => {
+//   setChecks((prev) => ({ ...prev, [key]: !prev[key] }));
+// };
+
+  // const [scheduleRegularity, setScheduleRegularity] = useState(0.5);
+  // const scheduleRef = useRef(scheduleRegularity);
+
+  // const [sleepSchedule, setSleepSchedule] = useState(0.5);
+  // const sleepRef = useRef(sleepSchedule);
+
+  // const [cleanliness, setCleanliness] = useState(0.5);
+  // const cleanRef = useRef(cleanliness);
+
+  // const [socialLevel, setSocialLevel] = useState(0.5);
+  // const socialRef = useRef(socialLevel);
+
+  // const [noiseLevel, setNoiseLevel] = useState(0.5);
+  // const noiseRef = useRef(noiseLevel);
+
+  const renderSlider = (labelLeft: string, labelRight: string,   stateKey: keyof typeof profile.preferences) => (
     <View style={styles.sliderGroup}>
       <View style={styles.labelsRow}>
         <Text style={styles.sideLabel}>{labelLeft}</Text>
@@ -52,9 +66,8 @@ export default function SliderScreen() {
         minimumValue={0}
         maximumValue={1}
         step={0.01}
-        value={value}
-        onValueChange={(val) => (refValue.current = val)}
-        onSlidingComplete={(val) => setValue(val)}
+        value={profile.preferences[stateKey] / 100}
+        onSlidingComplete={(val) => updatePreference(stateKey, val)}
         minimumTrackTintColor="#F6B151"
         maximumTrackTintColor="#F6B151"
         thumbTintColor="#4AC4C5"
@@ -62,17 +75,51 @@ export default function SliderScreen() {
     </View>
   );
 
+
+
+  // const renderSlider = (
+  //   labelLeft: string,
+  //   labelRight: string,
+  //   value: number,
+  //   setValue: (v: number) => void,
+  //   refValue: React.MutableRefObject<number>
+  // ) => (
+  //   <View style={styles.sliderGroup}>
+  //     <View style={styles.labelsRow}>
+  //       <Text style={styles.sideLabel}>{labelLeft}</Text>
+  //       <Text style={styles.sideLabel}>{labelRight}</Text>
+  //     </View>
+  //     <Slider
+  //       style={styles.slider}
+  //       minimumValue={0}
+  //       maximumValue={1}
+  //       step={0.01}
+  //       value={value}
+  //       onValueChange={(val) => (refValue.current = val)}
+  //       onSlidingComplete={(val) => setValue(val)}
+  //       minimumTrackTintColor="#F6B151"
+  //       maximumTrackTintColor="#F6B151"
+  //       thumbTintColor="#4AC4C5"
+  //     />
+  //   </View>
+  // );
+
   return (
     <View style={styles.mainContainer}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>What kind of living preferences do you have?</Text>
 
         {/* Sliders */}
-        {renderSlider('Quiet', 'Loud', noiseTolerance, setNoiseTolerance, noiseRef)}
+        {/* {renderSlider('Structured', 'Flexible', scheduleRegularity, setScheduleRegularity, noiseRef)}
         {renderSlider('Early Riser', 'Night Owl', sleepSchedule, setSleepSchedule, sleepRef)}
         {renderSlider('Clean Freak', 'Messy Nessy', cleanliness, setCleanliness, cleanRef)}
-        {renderSlider('Introvert', 'Extrovert', sociability, setSociability, socialRef)}
-        {renderSlider('Prefers Quiet', 'Prefers Loud', prefersQuiet, setPrefersQuiet, quietRef)}
+        {renderSlider('Introvert', 'Extrovert', socialLevel, setSocialLevel, socialRef)}
+        {renderSlider('Calm Home', 'Lively Home', noiseLevel, setNoiseLevel, noiseRef)} */}
+        {renderSlider('Structured 🗓️', 'Flexible 🌈', 'scheduleRegularity')}
+        {renderSlider('Early Riser', 'Night Owl', 'sleepSchedule')}
+        {renderSlider('Clean Freak', 'Messy Nessy', 'cleanliness')}
+        {renderSlider('Introvert', 'Extrovert', 'socialLevel')}
+        {renderSlider('Calm Home 🏡', 'Lively Home 🏡', 'noiseLevel')}
 
         <View style={styles.checkboxGroup}>
             <CustomCheckbox
@@ -91,8 +138,9 @@ export default function SliderScreen() {
             onPress={() => toggle('noOvernightGuests')}
             />
         </View>
-
       </ScrollView>
+
+
       <View style={styles.arrowContainer}>
         {/* Right Arrow */}
         <TouchableOpacity style={styles.rightArrow} onPress={() => navigation.navigate('Checkbox' as never)}>
