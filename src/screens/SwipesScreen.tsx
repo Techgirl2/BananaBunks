@@ -1,40 +1,121 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import Navbar from '../components/Navbar'; // Make sure path is correct
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import Swiper from 'react-native-deck-swiper';
+import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { db } from '../config/firebase';
+import { useProfile } from '../context/ProfileContext';
+import ProfileCard from '../components/ProfileCard';
+import Navbar from '../components/Navbar';
+import { ProfileType } from '../context/ProfileContext';
+import { LinearGradient } from 'expo-linear-gradient';
 
-export default function SwipesScreen() {
+export default function SwipeScreen() {
+  const { profile, setProfile } = useProfile();
+  const [candidates, setCandidates] = useState<ProfileType[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCandidates = async () => {
+      if (!profile?.uid) return;
+      const usersSnap = await getDocs(collection(db, 'users'));
+      const users: ProfileType[] = [];
+      usersSnap.forEach((docSnap) => {
+        const data = docSnap.data() as ProfileType;
+        if (
+          data.uid !== profile.uid &&
+          !profile.swipes.left.includes(data.uid) &&
+          !profile.swipes.right.includes(data.uid)
+        ) {
+          users.push(data);
+        }
+      });
+      setCandidates(users);
+      setLoading(false);
+    };
+
+    fetchCandidates();
+  }, [profile]);
+
+  const handleSwipe = async (direction: 'left' | 'right', swipedUser: ProfileType) => {
+    if (!profile) return;
+
+    const updatedProfile = {
+      ...profile,
+      swipes: {
+        ...profile.swipes,
+        [direction]: [...profile.swipes[direction], swipedUser.uid],
+      },
+    };
+
+    await updateDoc(doc(db, 'users', profile.uid), {
+      swipes: updatedProfile.swipes,
+    });
+
+    if (direction === 'right') {
+      const matchedUser = swipedUser;
+      if (matchedUser.swipes.right.includes(profile.uid)) {
+        const newMatches = [...profile.matches, matchedUser.uid];
+        const theirMatches = [...matchedUser.matches, profile.uid];
+
+        await updateDoc(doc(db, 'users', profile.uid), {
+          matches: newMatches,
+        });
+
+        await updateDoc(doc(db, 'users', matchedUser.uid), {
+          matches: theirMatches,
+        });
+
+        updatedProfile.matches = newMatches;
+        console.log('🎉 Match found!');
+      }
+    }
+
+    setProfile(updatedProfile);
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>Find a BananaBunk</Text>
-        {/* Add your other content here */}
-
-        <FontAwesome5 name="check-circle" size={24} color="black" />
-        
+    <LinearGradient
+      colors={['#F87575', '#75F8B5']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+      style={styles.gradient}
+    >
+      <View style={styles.swiperContainer}>
+        {loading ? (
+          <ActivityIndicator size="large" color="#FFC800" />
+        ) : candidates.length > 0 ? (
+          <Swiper
+            cards={candidates}
+            renderCard={(card) => <ProfileCard profile={card} />}
+            onSwipedLeft={(i) => handleSwipe('left', candidates[i])}
+            onSwipedRight={(i) => handleSwipe('right', candidates[i])}
+            stackSize={3}
+            backgroundColor="transparent"
+            cardIndex={0}
+          />
+        ) : (
+          <Text style={styles.emptyText}>No more profiles to swipe on 💤</Text>
+        )}
       </View>
-
       <Navbar />
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  gradient: {
     flex: 1,
-    justifyContent: 'space-between',
-    backgroundColor: '#0091AD',
   },
-  content: {
+  swiperContainer: {
     flex: 1,
+    justifyContent: 'center',
     padding: 16,
+    paddingBottom: 0,
   },
-  title: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    marginTop: 30,
-    marginBottom: 30,
+  emptyText: {
     textAlign: 'center',
+    marginTop: 20,
+    fontSize: 16,
+    color: 'white',
   },
 });
-

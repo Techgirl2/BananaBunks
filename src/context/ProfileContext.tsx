@@ -1,12 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-
-// these imports pull the state when the user logs in 
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
-// maintains profile state across pages
 
-type ProfileType = {
+// Define profile shape
+export type ProfileType = {
   uid: string;
   fullName: string;
   email: string;
@@ -32,6 +30,7 @@ type ProfileType = {
   matches: string[];
 };
 
+// Default empty profile
 const defaultProfile: ProfileType = {
   uid: '',
   fullName: '',
@@ -58,6 +57,7 @@ const defaultProfile: ProfileType = {
   matches: [],
 };
 
+// Create context
 const ProfileContext = createContext<{
   profile: ProfileType;
   setProfile: React.Dispatch<React.SetStateAction<ProfileType>>;
@@ -66,17 +66,17 @@ const ProfileContext = createContext<{
   setProfile: () => {},
 });
 
+// Provider
 export const ProfileProvider = ({ children }: { children: React.ReactNode }) => {
   const [profile, setProfile] = useState<ProfileType>(defaultProfile);
-
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Fetch user profile from Firestore
         const docRef = doc(db, 'users', user.uid);
         const docSnap = await getDoc(docRef);
-  
+
         if (docSnap.exists()) {
           console.log('Fetched profile from Firestore:', docSnap.data());
           setProfile(docSnap.data() as ProfileType);
@@ -85,11 +85,19 @@ export const ProfileProvider = ({ children }: { children: React.ReactNode }) => 
         }
       } else {
         console.log('User signed out or not logged in');
+        setProfile(defaultProfile);
       }
+
+      setLoading(false);
     });
-  
+
     return unsubscribe;
   }, []);
+
+  // Optional loading wrapper (prevents rendering children too early)
+  if (loading) {
+    return null; // Or <LoadingSpinner /> if you have one
+  }
 
   return (
     <ProfileContext.Provider value={{ profile, setProfile }}>
@@ -98,4 +106,5 @@ export const ProfileProvider = ({ children }: { children: React.ReactNode }) => 
   );
 };
 
+// Hook
 export const useProfile = () => useContext(ProfileContext);

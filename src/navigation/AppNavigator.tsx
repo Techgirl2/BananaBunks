@@ -10,8 +10,6 @@ import MatchesScreen from '../screens/MatchesScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SwipesScreen from '../screens/SwipesScreen';
 
-
-
 export type RootStackParamList = {
   Login: undefined;
   SignUp: undefined;
@@ -29,7 +27,7 @@ export default function AppNavigator() {
   return (
     <ProfileProvider>
     <NavigationContainer>
-    <Stack.Navigator initialRouteName="Login">
+      <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Slider" component={SliderScreen} options={{ headerShown: false }} />
