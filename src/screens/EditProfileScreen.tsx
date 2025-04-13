@@ -53,9 +53,9 @@ export default function EditProfileScreen() {
       // Write to Firestore
       await setDoc(userRef, profile);
   
-      alert('Profile saved successfully!');
+      //alert('Profile saved successfully!');
       // Optionally navigate somewhere
-      // navigation.navigate('Matches'); 
+      navigation.navigate('Swipes' as never)
     } catch (error) {
       console.error('Error saving profile: ', error);
       alert('There was an error saving your profile.');
@@ -161,7 +161,7 @@ export default function EditProfileScreen() {
 
       {/* Navigation arrows and Submit */}
       <View style={styles.arrowContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigation.navigate('Checkbox' as never)}>
           <FontAwesome name="arrow-left" size={30} color="#333" />
         </TouchableOpacity>
 

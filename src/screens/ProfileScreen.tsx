@@ -43,8 +43,8 @@ export default function ProfileScreen() {
 
         <View style={styles.profilePicPlaceholder} />
 
-        <TouchableOpacity style={styles.uploadButton}>
-          <Text style={styles.uploadButtonText}>+ Edit Photo</Text>
+        <TouchableOpacity style={styles.uploadButton} onPress={() => navigation.navigate('EditProfile' as never)}>
+          <Text style={styles.uploadButtonText}>Edit Profile</Text>
         </TouchableOpacity>
 
         <Text style={styles.emojis}>
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
       textAlign: 'center',
       marginBottom: 10,
-      marginTop: 35,
+      marginTop: 30,
     },
     profilePicPlaceholder: {
       width: 150,
@@ -118,6 +118,7 @@ const styles = StyleSheet.create({
       paddingVertical: 8,
       paddingHorizontal: 15,
       borderRadius: 20,
+      marginBottom: 15,
     },
     uploadButtonText: {
       color: 'white',
@@ -132,7 +133,7 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       flexWrap: 'wrap',
       justifyContent: 'center',
-      marginBottom: 20,
+      marginBottom: 15,
     },
     tag: {
       backgroundColor: '#F6B151',
@@ -150,7 +151,7 @@ const styles = StyleSheet.create({
       borderRadius: 15,
       padding: 10,
       fontSize: 16,
-      height: 200,
+      height: 190,
       textAlignVertical: 'top',
       marginBottom: 15,
     },
