@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100, // Add bottom padding to avoid being hidden under the navbar
   },
   title: {
-    fontSize: 20,
+    fontSize: 30,
     fontWeight: 'bold',
     marginTop: 35,
     marginBottom: 15,
