@@ -23,7 +23,7 @@ export default function AppNavigator() {
   return (
     <ProfileProvider>
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
+    <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Slider" component={SliderScreen} options={{ headerShown: false }} />

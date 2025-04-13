@@ -1,8 +1,13 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
+// these imports pull the state when the user logs in 
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../config/firebase';
 // maintains profile state across pages
 
 type ProfileType = {
+  uid: string;
   fullName: string;
   email: string;
   profilePicture: string;
@@ -28,6 +33,7 @@ type ProfileType = {
 };
 
 const defaultProfile: ProfileType = {
+  uid: '',
   fullName: '',
   email: '',
   profilePicture: '',
@@ -62,6 +68,28 @@ const ProfileContext = createContext<{
 
 export const ProfileProvider = ({ children }: { children: React.ReactNode }) => {
   const [profile, setProfile] = useState<ProfileType>(defaultProfile);
+
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Fetch user profile from Firestore
+        const docRef = doc(db, 'users', user.uid);
+        const docSnap = await getDoc(docRef);
+  
+        if (docSnap.exists()) {
+          console.log('Fetched profile from Firestore:', docSnap.data());
+          setProfile(docSnap.data() as ProfileType);
+        } else {
+          console.log('No profile found for user:', user.uid);
+        }
+      } else {
+        console.log('User signed out or not logged in');
+      }
+    });
+  
+    return unsubscribe;
+  }, []);
 
   return (
     <ProfileContext.Provider value={{ profile, setProfile }}>

@@ -7,6 +7,9 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import { useProfile } from '../context/ProfileContext';
 
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../config/firebase';
+
 export default function SignUpScreen() {
 
   const [email, setEmail] = useState('');
@@ -18,21 +21,43 @@ export default function SignUpScreen() {
   const { setProfile } = useProfile();
 
   const handleSignUp = async () => {
-    if (!fullName.trim()) {
-      Alert.alert('Missing Information', 'Please enter your full name.');
-      return;
-    }
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
   
-      // Update global profile context
-      setProfile(prev => ({
-        ...prev,
-        fullName,
-        email,
-      }));
+      // Create Firestore profile document
+      const profileData = {
+        uid: user.uid,
+        fullName: fullName, // add state for this!
+        email: email,
+        profilePicture: '',
+        preferences: {
+          scheduleRegularity: 50,
+          sleepSchedule: 50,
+          cleanliness: 50,
+          socialLevel: 50,
+          noiseLevel: 50,
+        },
+        rules: {
+          noPets: false,
+          noRoommates: false,
+          noOvernightGuests: false,
+        },
+        personalityTraits: [],
+        description: '',
+        swipes: {
+          right: [],
+          left: [],
+        },
+        matches: [],
+      };
   
+      await setDoc(doc(db, 'users', user.uid), profileData);
+  
+      // Update context
+      setProfile(profileData);
+  
+      // Navigate!
       navigation.navigate('Slider' as never);
     } catch (error: any) {
       Alert.alert('Registration Error', error.message);

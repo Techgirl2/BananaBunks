@@ -3,10 +3,17 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image } from 'reac
 import { FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useProfile } from '../context/ProfileContext';
+import * as ImagePicker from 'expo-image-picker';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from '../config/firebase'; 
+
+
+
 
 export default function EditProfileScreen() {
   const navigation = useNavigation();
-  const { profile } = useProfile();
+
+  const { profile, setProfile } = useProfile();
 
   const getPreferenceTags = () => {
     const tags: string[] = [];
@@ -41,16 +48,65 @@ export default function EditProfileScreen() {
     console.log('Submitting profile:', profile);
   };
 
+
+  const handlePickImage = async () => {
+    // Ask for permission
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  
+    if (permissionResult.granted === false) {
+      alert('Permission to access camera roll is required!');
+      return;
+    }
+  
+    // Open image picker
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+  
+    if (!result.canceled) {
+      // Upload image
+      const response = await fetch(result.assets[0].uri);
+      const blob = await response.blob();
+  
+      const imageRef = ref(storage, `profilePictures/${profile.uid}.jpg`);
+      await uploadBytes(imageRef, blob);
+  
+      // Get URL and update profile
+      const downloadURL = await getDownloadURL(imageRef);
+      setProfile(prev => ({
+        ...prev,
+        profilePicture: downloadURL,
+      }));
+  
+      alert('Profile picture updated!');
+    }
+  };
+
   return (
     <View style={styles.main}>
       <Text style={styles.title}>{profile.fullName || 'Your Name'}</Text>
 
-      <View style={styles.profilePicPlaceholder}>
-        {/* Placeholder profile picture */}
-      </View>
+      {profile.profilePicture ? (
+      <Image
+        source={{ uri: profile.profilePicture }}
+        style={{ width: 100, height: 100, borderRadius: 50 }}
+      />
+      ) : (
+      <View
+        style={{
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        backgroundColor: '#ccc',
+      }}
+      />
+      )}
 
-      <TouchableOpacity style={styles.uploadButton}>
-        <Text style={styles.uploadButtonText}>+ Add / update profile pic</Text>
+      <TouchableOpacity onPress={handlePickImage}>
+        <Text>+ Add / update profile pic</Text>
       </TouchableOpacity>
 
       {/* Personality emojis */}
@@ -103,14 +159,14 @@ export default function EditProfileScreen() {
 const styles = StyleSheet.create({
   main: { flex: 1, backgroundColor: '#F4E8A0', padding: 20 },
   title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 20 },
-  profilePicPlaceholder: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    backgroundColor: '#4AC4C5',
-    alignSelf: 'center',
-    marginBottom: 10,
-  },
+  // profilePicPlaceholder: {
+  //   width: 150,
+  //   height: 150,
+  //   borderRadius: 75,
+  //   backgroundColor: '#4AC4C5',
+  //   alignSelf: 'center',
+  //   marginBottom: 10,
+  // },
   uploadButton: {
     alignSelf: 'center',
     backgroundColor: '#4AC4C5',
