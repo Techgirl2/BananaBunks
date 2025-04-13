@@ -17,7 +17,8 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      Alert.alert('Login successful!');
+      //Alert.alert('Login successful!');
+      navigation.navigate('Matches' as never)
     } catch (error: any) {
       Alert.alert('Login Error', error.message);
     }
@@ -26,7 +27,7 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>BananaBucks</Text>
+      <Text style={styles.title}>BananaBunks</Text>
 
       <TextInput
         style={styles.input}

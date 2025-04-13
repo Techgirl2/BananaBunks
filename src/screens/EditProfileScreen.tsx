@@ -102,7 +102,7 @@ export default function EditProfileScreen() {
 
 const styles = StyleSheet.create({
   main: { flex: 1, backgroundColor: '#F4E8A0', padding: 20 },
-  title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 20 },
+  title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 20, marginTop: 35 },
   profilePicPlaceholder: {
     width: 150,
     height: 150,
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 10,
     fontSize: 16,
-    height: 120,
+    height: 215,
     textAlignVertical: 'top',
     marginBottom: 20,
   },

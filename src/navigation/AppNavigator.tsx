@@ -6,6 +6,10 @@ import SliderScreen from '../screens/SliderScreen';
 import CheckboxScreen from '../screens/CheckboxScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import { ProfileProvider } from '../context/ProfileContext';
+import MatchesScreen from '../screens/MatchesScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import SwipesScreen from '../screens/SwipesScreen';
+
 
 
 export type RootStackParamList = {
@@ -14,7 +18,9 @@ export type RootStackParamList = {
   Slider: undefined;
   Checkbox: undefined;
   EditProfile: undefined;
-
+  Matches: undefined;
+  Swipes: undefined;
+  Profile: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -29,6 +35,9 @@ export default function AppNavigator() {
         <Stack.Screen name="Slider" component={SliderScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Checkbox" component={CheckboxScreen} options={{ headerShown: false }} />
         <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Matches" component={MatchesScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Swipes" component={SwipesScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
     </ProfileProvider>
