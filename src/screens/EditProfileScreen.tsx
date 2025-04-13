@@ -6,6 +6,8 @@ import { useProfile } from '../context/ProfileContext';
 import * as ImagePicker from 'expo-image-picker';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../config/firebase'; 
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../config/firebase';
 
 
 
@@ -43,9 +45,21 @@ export default function EditProfileScreen() {
     return tags;
   };
 
-  const handleSubmit = () => {
-    // We'll hook this up to Firestore next!
-    console.log('Submitting profile:', profile);
+  const handleSubmit = async () => {
+    try {
+      // Reference to the user's document
+      const userRef = doc(db, 'users', profile.uid);
+  
+      // Write to Firestore
+      await setDoc(userRef, profile);
+  
+      alert('Profile saved successfully!');
+      // Optionally navigate somewhere
+      // navigation.navigate('Matches'); 
+    } catch (error) {
+      console.error('Error saving profile: ', error);
+      alert('There was an error saving your profile.');
+    }
   };
 
 
@@ -97,13 +111,16 @@ export default function EditProfileScreen() {
       ) : (
       <View
         style={{
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        backgroundColor: '#ccc',
+          width: 150,
+          height: 150,
+          borderRadius: 75,
+          backgroundColor: '#4AC4C5',
+          alignSelf: 'center',
+          marginBottom: 10,
       }}
       />
       )}
+
 
       <TouchableOpacity onPress={handlePickImage}>
         <Text>+ Add / update profile pic</Text>
@@ -206,7 +223,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 10,
     fontSize: 16,
-    height: 120,
+    height: 215,
     textAlignVertical: 'top',
     marginBottom: 20,
   },
